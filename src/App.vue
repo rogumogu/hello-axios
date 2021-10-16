@@ -1,16 +1,41 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <h1>Todos</h1>
+    <input type="text" v-model="todoName" @keyup.enter="addTodo">
+    <ul>
+      <li v-for="todo of todos" :key="todo.id">
+        {{todo.name}}
+        </li>
+    </ul>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import axios from 'axios'
+const baseURL = "http://localhost:3000/todos"
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
+  data() {
+    return {
+      todos: [],
+      todoName: ''
+    }
+  },
+  async created() {
+    try {
+      const res = await axios.get(baseURL)
+      this.todos = res.data
+    } catch (e) {
+      console.error(e)
+    }
+  },
+  methods: {
+    async addTodo() {
+      const res = await axios.post(baseURL, {name: this.todoName})
+      this.todos = [...this.todos, res.data]
+      this.todoName = ''
+    }
+  } 
 }
 </script>
 
@@ -22,5 +47,13 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+ul {
+  margin: 0px;
+  padding: 0px;
+}
+
+li {
+  list-style: none;
 }
 </style>
